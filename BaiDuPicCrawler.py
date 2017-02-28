@@ -41,7 +41,8 @@ def getPicURL(searchWord, pn):
               }
 
     try:
-        response = requests.get(URL, params=params, headers=headers, timeout=10)
+        response = requests.get(URL, params=params,
+                                headers=headers, timeout=10)
         response.raise_for_status()
     except exceptions.Timeout as e:
         print e.message
@@ -57,7 +58,8 @@ def getPicURL(searchWord, pn):
         print type(URLList)
         for num in range(30):
             try:
-                picURL = response.json()['data'][num]['replaceUrl'][0]['ObjURL']
+                picURL = response.json()['data'][num]['replaceUrl'
+                                                      ][0]['ObjURL']
             except KeyError as e:
                 print num
                 print e.message, '没有ObjURL'
@@ -95,15 +97,17 @@ def startCrawler(searchWord, startPage=1, endPage=1):
     if not os.path.isdir(searchWord):
         try:
             os.mkdir(searchWord)
-            for page in range(startPage, endPage + 1):
-                startPicIndex = (startPage - 1) * 30
-                getPicURL(searchWord, startPicIndex)
 
         except OSError:
             print 'there is a file named '+searchWord+'!!!!'
+            exit()
 
+    for page in range(startPage, endPage + 1):
+        startPicIndex = (page - 1) * 30
+        print str(startPicIndex)
+        getPicURL(searchWord, startPicIndex)
 
 
 if __name__ == '__main__':
 
-    startCrawler('花名未闻', startPage=3, endPage=4)
+    startCrawler('花名未闻', startPage=1, endPage=1)

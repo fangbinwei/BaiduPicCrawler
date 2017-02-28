@@ -40,34 +40,43 @@ def getPicURL(searchWord, pn):
               'rn': '30',
               }
 
-    response = requests.get(URL, params=params, headers=headers)
-    print response.content
-    print json.dumps(json.loads(response.content), indent=4)
+    try:
+        response = requests.get(URL, params=params, headers=headers, timeout=10)
+        response.raise_for_status()
+    except exceptions.Timeout as e:
+        print e.message
+    except exceptions.HTTPError as e:
+        print e.message
+    except Exception as e:
+        print 'something wrong!'
+    else:
+        print response.content
+        print json.dumps(json.loads(response.content), indent=4)
 
-    URLList = []
-    print type(URLList)
-    for num in range(30):
-        try:
-            picURL = response.json()['data'][num]['replaceUrl'][0]['ObjURL']
-        except KeyError as e:
-            print num
-            print e.message, '没有ObjURL'
-            picURL = response.json()['data'][num]['thumbURL']
+        URLList = []
+        print type(URLList)
+        for num in range(30):
+            try:
+                picURL = response.json()['data'][num]['replaceUrl'][0]['ObjURL']
+            except KeyError as e:
+                print num
+                print e.message, '没有ObjURL'
+                picURL = response.json()['data'][num]['thumbURL']
 
-        print picURL
-        URLList.append(picURL.encode('utf-8'))
+            print picURL
+            URLList.append(picURL.encode('utf-8'))
 
-    print '>>>>url'
-    print response.url
-    pprint.pprint(URLList)
-    print len(URLList)
-    basePath = os.getcwd()+'/'+searchWord+'/'
-    picIndex = len(os.listdir(basePath))+1
-    for num in range(len(URLList)):
-        postFix = URLList[num].split('.')[-1]
-        fileName = basePath+searchWord+str(picIndex)+'.'+postFix
-        downloadPic(URLList[num], fileName=fileName)
-        picIndex += 1
+        print '>>>>url'
+        print response.url
+        pprint.pprint(URLList)
+        print len(URLList)
+        basePath = os.getcwd()+'/'+searchWord+'/'
+        picIndex = len(os.listdir(basePath))+1
+        for num in range(len(URLList)):
+            postFix = URLList[num].split('.')[-1]
+            fileName = basePath+searchWord+str(picIndex)+'.'+postFix
+            downloadPic(URLList[num], fileName=fileName)
+            picIndex += 1
 
 
 def downloadPic(URL, fileName):
@@ -97,4 +106,4 @@ def startCrawler(searchWord, startPage=1, endPage=1):
 
 if __name__ == '__main__':
 
-    startCrawler('花', startPage=1, endPage=1)
+    startCrawler('花名未闻', startPage=3, endPage=4)
